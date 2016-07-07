@@ -12,14 +12,15 @@ class BitcoinServerCallback:
         return True
 
     async def make_query(self):
-        return response(None, [])
+        return None, []
 
     async def query(self):
         if not self.initialize(self._params):
             logging.error("Bad parameters specified: %s",
                           self._params, exc_info=True)
             return None
-        return await self.make_query()
+        ec, result = await self.make_query()
+        return self._response(ec, result)
 
     @property
     def _request_id(self):
@@ -28,7 +29,7 @@ class BitcoinServerCallback:
     def _params(self):
         return self._request["params"]
 
-    def response(self, ec, result):
+    def _response(self, ec, result):
         if ec is not None:
             result = []
         return {
@@ -64,7 +65,7 @@ class BsFetchLastHeight(BitcoinServerCallback):
 
     async def make_query(self):
         ec, height = await self._client.last_height()
-        return self.response(ec, [height])
+        return ec, [height]
 
 class BsFetchTransaction(BitcoinServerCallback):
 
@@ -79,7 +80,7 @@ class BsFetchTransaction(BitcoinServerCallback):
     async def make_query(self):
         ec, tx_data = await self._client.transaction(self._tx_hash)
         tx_data = encode_hex(tx_data)
-        return self.response(ec, [tx_data])
+        return ec, [tx_data]
 
 class BsFetchHistory(BitcoinServerCallback):
 
@@ -112,7 +113,7 @@ class BsFetchHistory(BitcoinServerCallback):
                     "height": height,
                     "outpoint_checksum": value
                 })
-        return self.response(ec, result)
+        return ec, result
 
 class BsFetchBlockHeader(BitcoinServerCallback):
 
@@ -125,7 +126,7 @@ class BsFetchBlockHeader(BitcoinServerCallback):
     async def make_query(self):
         ec, header = await self._client.block_header(self._index)
         header = encode_hex(header)
-        return self.response(ec, [header])
+        return ec, [header]
 
 class BsFetchBlockTransactionHashes(BitcoinServerCallback):
 
@@ -140,7 +141,7 @@ class BsFetchBlockTransactionHashes(BitcoinServerCallback):
         results = []
         for hash in hashes:
             results.append(encode_hex(hash))
-        return self.response(ec, results)
+        return ec, results
 
 class BsFetchSpend(BitcoinServerCallback):
 
@@ -159,7 +160,7 @@ class BsFetchSpend(BitcoinServerCallback):
 
     async def make_query(self):
         ec, spend = await self._client.spend(self._outpoint)
-        return self.response(ec, [spend.tuple()])
+        return ec, [spend.tuple()]
 
 class BsFetchTransactionIndex(BitcoinServerCallback):
 
@@ -173,7 +174,7 @@ class BsFetchTransactionIndex(BitcoinServerCallback):
 
     async def make_query(self):
         ec, height, index = await self._client.transaction_index(self._tx_hash)
-        return self.response(ec, [height, index])
+        return ec, [height, index]
 
 class BsFetchBlockHeight(BitcoinServerCallback):
 
@@ -187,7 +188,7 @@ class BsFetchBlockHeight(BitcoinServerCallback):
 
     async def make_query(self):
         ec, height = await self._client.block_height(self._block_hash)
-        return self.response(ec, [height])
+        return ec, [height]
 
 class BsFetchStealth(BitcoinServerCallback):
 
@@ -211,7 +212,7 @@ class BsFetchStealth(BitcoinServerCallback):
                 "address_hash": encode_hex(address_hash),
                 "tx_hash": encode_hex(tx_hash)
             })
-        return self.response(ec, results)
+        return ec, results
 
 class BitcoinServerModule:
 
@@ -224,7 +225,7 @@ class BitcoinServerModule:
         "fetch_spend":                      BsFetchSpend,
         "fetch_transaction_index":          BsFetchTransactionIndex,
         "fetch_block_height":               BsFetchBlockHeight,
-        "fetch_stealth":                    BsFetchStealth,
+        "fetch_stealth":                    BsFetchStealth
     }
 
     def __init__(self, client):

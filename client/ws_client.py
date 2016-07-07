@@ -151,13 +151,13 @@ async def hello():
     async with websockets.connect('ws://localhost:8888') as websocket:
         await test_fetch_last_height(websocket)
         await test_fetch_transaction(websocket)
-        await test_fetch_history(websocket)
-        await test_fetch_block_header(websocket)
-        await test_fetch_block_transaction_hashes(websocket)
-        await test_fetch_spend(websocket)
-        await test_fetch_transaction_index(websocket)
-        await test_fetch_block_height(websocket)
-        await test_fetch_stealth(websocket)
+        #await test_fetch_history(websocket)
+        #await test_fetch_block_header(websocket)
+        #await test_fetch_block_transaction_hashes(websocket)
+        #await test_fetch_spend(websocket)
+        #await test_fetch_transaction_index(websocket)
+        #await test_fetch_block_height(websocket)
+        #await test_fetch_stealth(websocket)
 
 asyncio.get_event_loop().run_until_complete(hello())
 
