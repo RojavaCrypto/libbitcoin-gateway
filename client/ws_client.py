@@ -147,10 +147,26 @@ async def test_fetch_stealth(websocket):
     response = json.loads(await websocket.recv())
     print(json.dumps(response, indent=2))
 
+async def test_ticker(websocket):
+    print("Testing fetch stealth...")
+
+    message = json.dumps({
+        "command": "fetch_ticker",
+        "id": 1,
+        "params": [
+            "USD"
+        ]
+    })
+    print("Sending:", message)
+    await websocket.send(message)
+
+    response = json.loads(await websocket.recv())
+    print(json.dumps(response, indent=2))
+
 async def hello():
     async with websockets.connect('ws://localhost:8888') as websocket:
-        await test_fetch_last_height(websocket)
-        await test_fetch_transaction(websocket)
+        #await test_fetch_last_height(websocket)
+        #await test_fetch_transaction(websocket)
         #await test_fetch_history(websocket)
         #await test_fetch_block_header(websocket)
         #await test_fetch_block_transaction_hashes(websocket)
@@ -158,6 +174,7 @@ async def hello():
         #await test_fetch_transaction_index(websocket)
         #await test_fetch_block_height(websocket)
         #await test_fetch_stealth(websocket)
+        await test_ticker(websocket)
 
 asyncio.get_event_loop().run_until_complete(hello())
 

@@ -1,3 +1,4 @@
+import logging
 import threading
 import json
 import time
@@ -66,6 +67,6 @@ class TickerHandler:
             "error": None,
             "result": [ticker_value]
         }
-        socket_handler.queue_response(response)
+        socket_handler.queue(response)
         return True
 
