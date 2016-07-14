@@ -133,7 +133,7 @@ class JsonChanHandlerBase(object):
         }
         if error:
             response["error"] = error
-        self._handler.queue_response(response)
+        self._handler.queue(response)
 
     def process(self, params):
         print("process jsonchan req", self._json_chan)
@@ -178,7 +178,7 @@ class ObJsonChanSubscribe(JsonChanHandlerBase):
             raise ClientGone()
             #section = self._json_chan.get_section(self._params[0])
             #section.unsubscribe(self._params[1], self.send_notification)
-        self._handler.queue_response(data)
+        self._handler.queue(data)
 
 class ObJsonChanUnsubscribe(JsonChanHandlerBase):
     def process(self, params):
