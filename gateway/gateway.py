@@ -12,6 +12,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 import gateway.bs_module
 import gateway.subscribe_module
+import gateway.legacy
 
 def create_random_id():
     MAX_UINT32 = 4294967295
@@ -27,13 +28,7 @@ class GatewayApplication(tornado.web.Application):
         self.bs_module = gateway.bs_module.BitcoinServerModule(self._client)
         self.subscribe_module = gateway.subscribe_module.SubscribeModule(
             self._client, loop)
-        #client = obelisk.ObeliskOfLightClient(service)
-        #self.obelisk_handler = obelisk_handler.ObeliskHandler(client, self.ws_client)
-        #self.brc_handler = broadcast.BroadcastHandler()
-        #self.p2p = CryptoTransportLayer(config.get('p2p-port', 8889), config.get('external-ip', '127.0.0.1'), config.get('internal-ip', None))
-        #self.p2p.join_network(config.get('seeds', []))
-        #self.json_chan_handler = jsonchan.JsonChanHandler(self.p2p)
-        #self.ticker_handler = ticker.TickerHandler()
+        self.legacy_module = gateway.legacy.LegacyModule(self._settings)
 
         handlers = [
             # /block/<block hash>
@@ -80,6 +75,7 @@ class QuerySocketHandler(tornado.websocket.WebSocketHandler):
         self._loop = loop
         self._bs_module = self.application.bs_module
         self._subscribe_module = self.application.subscribe_module
+        self._legacy_module = self.application.legacy_module
         #self._obelisk_handler = self.application.obelisk_handler
         #self._brc_handler = self.application.brc_handler
         #self._json_chan_handler = self.application.json_chan_handler
@@ -134,6 +130,10 @@ class QuerySocketHandler(tornado.websocket.WebSocketHandler):
         if not self._check_request(request):
             logging.error("Malformed request: %s", request, exc_info=True)
             self.close()
+            return
+
+        if request["command"] in self._legacy_module.commands:
+            self._legacy_module.handle_request(self, request)
             return
 
         response = await self._handle_request(request)
