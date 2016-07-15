@@ -7,8 +7,6 @@ from gateway.lib.crypto2crypto import CryptoTransportLayer
 class LegacyModule:
 
     commands = [
-        # Broadcaster
-        "broadcast_transaction",
         # Ticker
         "fetch_ticker",
         # JSON Chan

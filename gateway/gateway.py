@@ -12,6 +12,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 import gateway.bs_module
 import gateway.subscribe_module
+import gateway.brc
 import gateway.legacy
 
 def create_random_id():
@@ -28,7 +29,9 @@ class GatewayApplication(tornado.web.Application):
         self.bs_module = gateway.bs_module.BitcoinServerModule(self._client)
         self.subscribe_module = gateway.subscribe_module.SubscribeModule(
             self._client, loop)
-        self.legacy_module = gateway.legacy.LegacyModule(self._settings)
+        self.brc_module = gateway.brc.Broadcaster(context, settings, loop,
+                                                  self._client)
+        self.legacy_module = gateway.legacy.LegacyModule(settings)
 
         handlers = [
             # /block/<block hash>
@@ -75,6 +78,7 @@ class QuerySocketHandler(tornado.websocket.WebSocketHandler):
         self._loop = loop
         self._bs_module = self.application.bs_module
         self._subscribe_module = self.application.subscribe_module
+        self._brc_module = self.application.brc_module
         self._legacy_module = self.application.legacy_module
         #self._obelisk_handler = self.application.obelisk_handler
         #self._brc_handler = self.application.brc_handler
@@ -148,6 +152,8 @@ class QuerySocketHandler(tornado.websocket.WebSocketHandler):
             response = await self._bs_module.handle(request)
         elif request["command"] in self._subscribe_module.commands:
             response = await self._subscribe_module.handle(request, self)
+        elif request["command"] in self._brc_module.commands:
+            response = await self._brc_module.handle(request, self)
         else:
             logging.warning("Unhandled command. Dropping request: %s",
                 request, exc_info=True)

@@ -13,23 +13,28 @@ class Settings:
     def load(self):
         config = configparser.ConfigParser()
         config.read(self._args.config)
+
+        # [main]
         main = config["main"]
         self.websocket_port = int(main.get("websocket-port", 8888))
-        self.broadcaster_url = main.get("broadcaster-url",
-                                        "tcp://localhost:9109")
+        self.txradar_url = main.get("txradar-url", "tcp://localhost:7678")
+        self.txradar_expire_time = int(main.get("txradar-expire-time", 200))
+        self.txradar_cleanup_timeout = \
+            int(main.get("txradar-cleanup-timeout", 200))
         self.bs_url = main.get("bs-url", "tcp://gateway.unsystem.net:9091")
-
-        # Crypto2Crypto
-        self.p2p_port = int(main.get("p2p-port", 8889))
-        self.external_ip = main.get("external-ip", "85.25.198.211")
-        self.internal_ip = main.get("internal-ip", "192.168.1.10")
-        self.seeds = main.get("seeds", "tcp://85.25.198.213:8889")
-        self.seeds = [seed.strip() for seed in self.seeds.split(",")]
 
         # Give precedence to command line over config file.
         self.port = self._args.port
         if self.port is None:
             self.port = int(main.get("port", 8888))
+
+        # [p2p]
+        p2p = config["p2p"]
+        self.p2p_port = int(p2p.get("p2p-port", 8889))
+        self.external_ip = p2p.get("external-ip", "85.25.198.211")
+        self.internal_ip = p2p.get("internal-ip", "192.168.1.10")
+        self.seeds = p2p.get("seeds", "tcp://85.25.198.213:8889")
+        self.seeds = [seed.strip() for seed in self.seeds.split(",")]
 
 def main():
     # Command line arguments
