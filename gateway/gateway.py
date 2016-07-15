@@ -68,6 +68,7 @@ class GatewayApplication(tornado.web.Application):
         super().__init__(handlers, tornado_settings)
 
     def start_listen(self):
+        print("Listening on port %s" % self._settings.port)
         self.listen(self._settings.port)
 
 class QuerySocketHandler(tornado.websocket.WebSocketHandler):
