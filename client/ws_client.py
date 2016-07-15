@@ -11,12 +11,13 @@ async def test_fetch_last_height(websocket):
         "id": 1,
         "params": [
         ]
-    })
+    }, indent=2)
     print("Sending:", message)
     await websocket.send(message)
 
     response = json.loads(await websocket.recv())
     print(json.dumps(response, indent=2))
+    print()
 
 async def test_fetch_transaction(websocket):
     print("Testing fetch transaction...")
@@ -27,12 +28,13 @@ async def test_fetch_transaction(websocket):
         "params": [
             "ee475443f1fbfff84ffba43ba092a70d291df233bd1428f3d09f7bd1a6054a1f"
         ]
-    })
+    }, indent=2)
     print("Sending:", message)
     await websocket.send(message)
 
     response = json.loads(await websocket.recv())
     print(json.dumps(response, indent=2))
+    print()
 
 async def test_fetch_history(websocket):
     print("Testing fetch history...")
@@ -43,12 +45,13 @@ async def test_fetch_history(websocket):
         "params": [
             "13ejSKUxLT9yByyr1bsLNseLbx9H9tNj2d"
         ]
-    })
+    }, indent=2)
     print("Sending:", message)
     await websocket.send(message)
 
     response = json.loads(await websocket.recv())
     print(json.dumps(response, indent=2))
+    print()
 
 async def test_fetch_block_header(websocket):
     print("Testing fetch block_header...")
@@ -59,12 +62,13 @@ async def test_fetch_block_header(websocket):
         "params": [
             "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
         ]
-    })
+    }, indent=2)
     print("Sending:", message)
     await websocket.send(message)
 
     response = json.loads(await websocket.recv())
     print(json.dumps(response, indent=2))
+    print()
 
 async def test_fetch_block_transaction_hashes(websocket):
     print("Testing fetch block_transaction_hashes...")
@@ -75,12 +79,13 @@ async def test_fetch_block_transaction_hashes(websocket):
         "params": [
             "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
         ]
-    })
+    }, indent=2)
     print("Sending:", message)
     await websocket.send(message)
 
     response = json.loads(await websocket.recv())
     print(json.dumps(response, indent=2))
+    print()
 
 async def test_fetch_spend(websocket):
     print("Testing fetch spend...")
@@ -92,12 +97,13 @@ async def test_fetch_spend(websocket):
             ("0530375a5bf4ea9a82494fcb5ef4a61076c2af807982076fa810851f4bc31c09",
              0)
         ]
-    })
+    }, indent=2)
     print("Sending:", message)
     await websocket.send(message)
 
     response = json.loads(await websocket.recv())
     print(json.dumps(response, indent=2))
+    print()
 
 async def test_fetch_transaction_index(websocket):
     print("Testing fetch transaction_index...")
@@ -108,12 +114,13 @@ async def test_fetch_transaction_index(websocket):
         "params": [
             "ee475443f1fbfff84ffba43ba092a70d291df233bd1428f3d09f7bd1a6054a1f"
         ]
-    })
+    }, indent=2)
     print("Sending:", message)
     await websocket.send(message)
 
     response = json.loads(await websocket.recv())
     print(json.dumps(response, indent=2))
+    print()
 
 async def test_fetch_block_height(websocket):
     print("Testing fetch block_height...")
@@ -124,12 +131,13 @@ async def test_fetch_block_height(websocket):
         "params": [
             "000000000000048b95347e83192f69cf0366076336c639f9b7228e9ba171342e"
         ]
-    })
+    }, indent=2)
     print("Sending:", message)
     await websocket.send(message)
 
     response = json.loads(await websocket.recv())
     print(json.dumps(response, indent=2))
+    print()
 
 async def test_fetch_stealth(websocket):
     print("Testing fetch stealth...")
@@ -140,12 +148,13 @@ async def test_fetch_stealth(websocket):
         "params": [
             "11", 419135
         ]
-    })
+    }, indent=2)
     print("Sending:", message)
     await websocket.send(message)
 
     response = json.loads(await websocket.recv())
     print(json.dumps(response, indent=2))
+    print()
 
 async def test_ticker(websocket):
     print("Testing ticker...")
@@ -162,6 +171,7 @@ async def test_ticker(websocket):
 
     response = json.loads(await websocket.recv())
     print(json.dumps(response, indent=2))
+    print()
 
 async def test_broadcast(websocket):
     print("Testing broadcast...")
@@ -183,17 +193,17 @@ async def test_broadcast(websocket):
 
 async def hello():
     async with websockets.connect('ws://localhost:8888') as websocket:
-        #await test_fetch_last_height(websocket)
-        #await test_fetch_transaction(websocket)
-        #await test_fetch_history(websocket)
-        #await test_fetch_block_header(websocket)
-        #await test_fetch_block_transaction_hashes(websocket)
-        #await test_fetch_spend(websocket)
-        #await test_fetch_transaction_index(websocket)
-        #await test_fetch_block_height(websocket)
-        #await test_fetch_stealth(websocket)
+        await test_fetch_last_height(websocket)
+        await test_fetch_transaction(websocket)
+        await test_fetch_history(websocket)
+        await test_fetch_block_header(websocket)
+        await test_fetch_block_transaction_hashes(websocket)
+        await test_fetch_spend(websocket)
+        await test_fetch_transaction_index(websocket)
+        await test_fetch_block_height(websocket)
+        await test_fetch_stealth(websocket)
         #await test_ticker(websocket)
-        await test_broadcast(websocket)
+        #await test_broadcast(websocket)
 
 asyncio.get_event_loop().run_until_complete(hello())
 

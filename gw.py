@@ -22,6 +22,8 @@ class Settings:
         self.txradar_cleanup_timeout = \
             int(main.get("txradar-cleanup-timeout", 200))
         self.bs_url = main.get("bs-url", "tcp://gateway.unsystem.net:9091")
+        self.bs_query_expire_time = \
+            int(main.get("bs-query-expire-time", 200))
 
         # Give precedence to command line over config file.
         self.port = self._args.port

@@ -1,5 +1,6 @@
 import json
 import random
+import traceback
 import tornado.options
 import tornado.web
 import tornado.websocket
@@ -24,7 +25,9 @@ class GatewayApplication(tornado.web.Application):
     def __init__(self, context, settings, loop):
         self._context = context
         self._settings = settings
-        self._client = self._context.Client(self._settings.bs_url)
+        client_settings = libbitcoin.ClientSettings()
+        client_settings.query_expire_time = settings.bs_query_expire_time
+        self._client = self._context.Client(settings.bs_url, client_settings)
         # Setup the modules
         self.bs_module = gateway.bs_module.BitcoinServerModule(self._client)
         self.subscribe_module = gateway.subscribe_module.SubscribeModule(

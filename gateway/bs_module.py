@@ -32,6 +32,7 @@ class BitcoinServerCallback:
     def _response(self, ec, result):
         if ec is not None:
             result = []
+            ec = ec.name
         return {
             "id": self._request_id,
             "error": ec,
@@ -65,6 +66,8 @@ class BsFetchLastHeight(BitcoinServerCallback):
 
     async def make_query(self):
         ec, height = await self._client.last_height()
+        if ec:
+            return ec, []
         return ec, [height]
 
 class BsFetchTransaction(BitcoinServerCallback):
@@ -79,6 +82,8 @@ class BsFetchTransaction(BitcoinServerCallback):
 
     async def make_query(self):
         ec, tx_data = await self._client.transaction(self._tx_hash)
+        if ec:
+            return ec, []
         tx_data = encode_hex(tx_data)
         return ec, [tx_data]
 
@@ -96,6 +101,8 @@ class BsFetchHistory(BitcoinServerCallback):
     async def make_query(self):
         ec, history = await self._client.history(self._address,
                                                  from_height=self._from_height)
+        if ec:
+            return ec, []
         result = []
         for point, height, value in history:
             if type(point) == libbitcoin.OutPoint:
@@ -125,6 +132,8 @@ class BsFetchBlockHeader(BitcoinServerCallback):
 
     async def make_query(self):
         ec, header = await self._client.block_header(self._index)
+        if ec:
+            return ec, []
         header = encode_hex(header)
         return ec, [header]
 
@@ -138,6 +147,8 @@ class BsFetchBlockTransactionHashes(BitcoinServerCallback):
 
     async def make_query(self):
         ec, hashes = await self._client.block_transaction_hashes(self._index)
+        if ec:
+            return ec, []
         results = []
         for hash in hashes:
             results.append(encode_hex(hash))
@@ -160,6 +171,8 @@ class BsFetchSpend(BitcoinServerCallback):
 
     async def make_query(self):
         ec, spend = await self._client.spend(self._outpoint)
+        if ec:
+            return ec, []
         return ec, [spend.tuple()]
 
 class BsFetchTransactionIndex(BitcoinServerCallback):
@@ -174,6 +187,8 @@ class BsFetchTransactionIndex(BitcoinServerCallback):
 
     async def make_query(self):
         ec, height, index = await self._client.transaction_index(self._tx_hash)
+        if ec:
+            return ec, []
         return ec, [height, index]
 
 class BsFetchBlockHeight(BitcoinServerCallback):
@@ -188,6 +203,8 @@ class BsFetchBlockHeight(BitcoinServerCallback):
 
     async def make_query(self):
         ec, height = await self._client.block_height(self._block_hash)
+        if ec:
+            return ec, []
         return ec, [height]
 
 class BsFetchStealth(BitcoinServerCallback):
@@ -205,6 +222,8 @@ class BsFetchStealth(BitcoinServerCallback):
 
     async def make_query(self):
         ec, rows = await self._client.stealth(self._prefix, self._from_height)
+        if ec:
+            return ec, []
         results = []
         for ephemkey, address_hash, tx_hash in rows:
             results.append({
