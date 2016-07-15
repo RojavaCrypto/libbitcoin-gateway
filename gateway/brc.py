@@ -18,7 +18,7 @@ class RadarInterface:
         loop.spawn_callback(self._listen)
 
         self._loop = loop
-        self._expire_time = settings.txradar_expire_time
+        self._expire_time = settings.txradar_watch_expire_time
         self._cleanup_timeout = settings.txradar_cleanup_timeout
         self._schedule_cleanup()
 

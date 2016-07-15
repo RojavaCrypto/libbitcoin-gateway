@@ -16,19 +16,22 @@ class Settings:
 
         # [main]
         main = config["main"]
-        self.websocket_port = int(main.get("websocket-port", 8888))
-        self.txradar_url = main.get("txradar-url", "tcp://localhost:7678")
-        self.txradar_expire_time = int(main.get("txradar-expire-time", 200))
-        self.txradar_cleanup_timeout = \
-            int(main.get("txradar-cleanup-timeout", 200))
-        self.bs_url = main.get("bs-url", "tcp://gateway.unsystem.net:9091")
-        self.bs_query_expire_time = \
-            int(main.get("bs-query-expire-time", 200))
-
         # Give precedence to command line over config file.
         self.port = self._args.port
         if self.port is None:
             self.port = int(main.get("port", 8888))
+
+        # [bs]
+        bs = config["bs"]
+        self.bs_url = bs.get("url", "tcp://gateway.unsystem.net:9091")
+        self.bs_query_expire_time = int(bs.get("query-expire-time", 200))
+
+        # [txradar]
+        txradar = config["txradar"]
+        self.txradar_url = txradar.get("url", "tcp://localhost:7678")
+        self.txradar_watch_expire_time = \
+            int(txradar.get("watch-expire-time", 200))
+        self.txradar_cleanup_timeout = int(txradar.get("cleanup-timeout", 200))
 
         # [p2p]
         p2p = config["p2p"]
