@@ -33,12 +33,14 @@ class RadarInterface:
 
     async def _clean_old(self):
         time_now = time.time()
-        for tx_hash, notify in self._monitored.items():
-            if notify.timestamp + self._expire_time < time_now:
-                del self._monitored[tx_hash]
+        is_expired = lambda notify: \
+            notify.timestamp + self._expire_time < time_now
+        # Delete expired items.
+        self._monitored = {tx_hash: notify for tx_hash, notify in
+                           self._monitored.items() if not is_expired(notify)}
         self._schedule_cleanup()
 
-    def monitor(tx_hash, notify):
+    def monitor(self, tx_hash, notify):
         self._monitored[tx_hash] = notify
 
 class NotifyCallback:

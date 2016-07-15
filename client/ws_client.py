@@ -166,6 +166,7 @@ async def test_ticker(websocket):
 async def test_broadcast(websocket):
     print("Testing broadcast...")
 
+    # ee475443f1fbfff84ffba43ba092a70d291df233bd1428f3d09f7bd1a6054a1f
     message = json.dumps({
         "command": "broadcast_transaction",
         "id": 1,
@@ -176,8 +177,9 @@ async def test_broadcast(websocket):
     print("Sending:", message)
     await websocket.send(message)
 
-    response = json.loads(await websocket.recv())
-    print(json.dumps(response, indent=2))
+    while True:
+        response = json.loads(await websocket.recv())
+        print(json.dumps(response, indent=2))
 
 async def hello():
     async with websockets.connect('ws://localhost:8888') as websocket:
