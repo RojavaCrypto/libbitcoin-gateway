@@ -192,7 +192,7 @@ async def test_broadcast(websocket):
         print(json.dumps(response, indent=2))
 
 async def hello():
-    async with websockets.connect('ws://localhost:8888') as websocket:
+    async with websockets.connect('ws://104.207.129.55:8888') as websocket:
         await test_fetch_last_height(websocket)
         await test_fetch_transaction(websocket)
         await test_fetch_history(websocket)
