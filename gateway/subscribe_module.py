@@ -1,9 +1,6 @@
-import binascii
 import libbitcoin
 import gateway.bs_module
-
-def encode_hex(hash):
-    return str(binascii.hexlify(hash), "ascii")
+from gateway.util import encode_hex
 
 def make_key(prefix, connection):
     return "%s_%s" % (str(prefix), str(connection.connection_id))

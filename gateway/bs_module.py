@@ -1,6 +1,6 @@
-import binascii
 import logging
 import libbitcoin
+from gateway.util import encode_hex
 
 class BitcoinServerCallback:
 
@@ -47,9 +47,6 @@ def decode_hash(encoded_hash):
     if len(decoded_hash) != 32:
         return None
     return decoded_hash
-
-def encode_hex(value):
-    return binascii.hexlify(value).decode("ascii")
 
 def unpack_index(index):
     if type(index) == str:

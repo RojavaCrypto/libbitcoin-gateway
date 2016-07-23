@@ -95,15 +95,15 @@ class QuerySocketHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         self.connection_id = create_random_id()
         logging.info("OPEN")
+        self._connected = True
         #with QuerySocketHandler.listen_lock:
         #    self.listeners.add(self)
-        #self._connected = True
 
     def on_close(self):
         logging.info("CLOSE")
+        self._connected = False
         self._loop.spawn_callback(self._close)
         #disconnect_msg = {'command': 'disconnect_client', 'id': 0, 'params': []}
-        #self._connected = False
         #self._obelisk_handler.handle_request(self, disconnect_msg)
         #self._json_chan_handler.handle_request(self, disconnect_msg)
         #with QuerySocketHandler.listen_lock:

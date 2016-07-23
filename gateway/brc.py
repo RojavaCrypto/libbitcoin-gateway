@@ -2,6 +2,7 @@ import logging
 import time
 import zmq
 import libbitcoin
+from gateway.util import encode_hex
 
 def hash_transaction(raw_tx):
     return libbitcoin.bitcoin_hash(raw_tx)[::-1]
@@ -18,7 +19,6 @@ class RadarInterface:
         loop.spawn_callback(self._listen)
 
         self._loop = loop
-        self._expire_time = settings.txradar_watch_expire_time
         self._cleanup_timeout = settings.txradar_cleanup_timeout
         self._schedule_cleanup()
 
@@ -29,15 +29,20 @@ class RadarInterface:
         while True:
             _, tx_hash = await self._socket.recv_multipart()
             if tx_hash in self._monitored:
-                self._monitored[tx_hash].notify()
+                self._notify(tx_hash)
+
+    def _notify(self, tx_hash):
+        assert tx_hash in self._monitored
+        cb = self._monitored[tx_hash]
+        if cb.is_expired():
+            del self._monitored[tx_hash]
+            return
+        cb.notify(tx_hash)
 
     async def _clean_old(self):
-        time_now = time.time()
-        is_expired = lambda notify: \
-            notify.timestamp + self._expire_time < time_now
         # Delete expired items.
         self._monitored = {tx_hash: notify for tx_hash, notify in
-                           self._monitored.items() if not is_expired(notify)}
+                           self._monitored.items() if not notify.is_expired()}
         self._schedule_cleanup()
 
     def monitor(self, tx_hash, notify):
@@ -45,30 +50,39 @@ class RadarInterface:
 
 class NotifyCallback:
 
-    def __init__(self, connection, request_id):
+    def __init__(self, connection, expire_time):
         self._connection = connection
-        self._request_id = request_id
-        self.timestamp = time.time()
+        self._timestamp = time.time()
+        self._expire_time = expire_time
         self._count = 0
 
-    def notify(self):
+    def notify(self, tx_hash):
         response = {
-            "id": self._request_id,
-            "error": None,
-            "result": [self._count, "radar"]
+            "command": "broadcast.update",
+            "params": [
+                encode_hex(tx_hash),
+                self._count
+            ]
         }
         self._connection.queue(response)
         self._count += 1
 
+    def is_expired(self):
+        if not self._connection._connected:
+            return True
+        time_now = time.time()
+        return self._timestamp + self._expire_time < time_now
+
 class Broadcaster:
 
     commands = [
-        "broadcast_transaction"
+        "broadcast"
     ]
 
     def __init__(self, context, settings, loop, client):
         self._client = client
         self._radar = RadarInterface(context, settings, loop)
+        self._expire_time = settings.txradar_watch_expire_time
 
     @staticmethod
     def parse_params(request):
@@ -87,16 +101,15 @@ class Broadcaster:
         raw_tx = self.parse_params(request)
         if raw_tx is None:
             return None
-        request_id = request["id"]
         # Prepare notifier object
         tx_hash = hash_transaction(raw_tx)
-        notify = NotifyCallback(connection, request_id)
+        notify = NotifyCallback(connection, self._expire_time)
         self._radar.monitor(tx_hash, notify)
         # Add to txradar
         ec = await self._client.broadcast(raw_tx)
         # Response
         return {
-            "id": request_id,
+            "id": request["id"],
             "error": ec,
             "result": [
             ]
