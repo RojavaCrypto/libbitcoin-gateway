@@ -78,6 +78,10 @@ class QuerySocketHandler(tornado.websocket.WebSocketHandler):
     # Protects listeners
     #listen_lock = threading.Lock()
 
+    # Accept all connections.
+    def check_origin(self, origin):
+        return True
+
     def initialize(self, loop):
         self._loop = loop
         self._bs_module = self.application.bs_module
