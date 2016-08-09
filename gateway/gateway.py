@@ -174,7 +174,7 @@ class QuerySocketHandler(tornado.websocket.WebSocketHandler):
 
     def _send(self, message):
         try:
-            self.write_message(json.dumps(message))
+            self.write_message(message)
         except tornado.websocket.WebSocketClosedError:
             self._connected = False
             logging.warning("Dropping response to closed socket: %s",
