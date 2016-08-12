@@ -1,0 +1,58 @@
+<html>
+  <head>
+  <title>WebSocket client example</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="jquery-1.9.1.min.js"></script>
+  <link href="ubuntuFont.css" rel="stylesheet" type="text/css">
+  <script>
+	var ws_url = "ws://localhost:8888/";
+
+	function startup() {
+		console.log("startup");
+		var ws = new WebSocket(ws_url);
+		ws.onopen = function() {
+		  var request = {
+			"id": 1,
+			"command": "fetch_history",
+			"params": ["1HAZ8boJLpHMGvpXnY7UwRnLpd7B2zVPBe", 0]
+		  }
+		  var message = JSON.stringify(request);
+		  ws.send(message);
+		};
+		ws.onmessage = function(evt) {
+          var pretty = JSON.stringify(JSON.parse(evt.data), null, 2);
+          console.log(pretty);
+          $("#ws_result").html("<pre><code>" + pretty + "</code></pre>");
+		};
+	}
+  </script>
+  <style>
+	body {
+		font-family: Ubuntu;
+		font-size: 18px;
+		background-color: whitesmoke;
+	}
+	.page_body {
+		width: 60%;
+		margin-top: 90px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+  </style>
+  </head>
+
+  <body>
+	<div class="page_body">
+		<h1>WebSockets libbitcoin client</h1>
+        <p>This app will call fetch_history.</p>
+		<p id="ws_result"></p>
+	</div>
+  <script>
+	$(document).ready(function() {
+		startup();
+	});
+  </script>
+  </body>
+</html>
+
